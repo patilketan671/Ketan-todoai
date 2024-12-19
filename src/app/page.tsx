@@ -21,6 +21,7 @@ export default function Home() {
     const baseY = rect.top + rect.height / 2;
 
     const steps: FlowStep[] = [
+      // Click
       {
         id: 'click',
         label: 'click',
@@ -31,6 +32,7 @@ export default function Home() {
         step: 1,
         shape: 'circle'
       },
+      // Toggle
       {
         id: 'toggle',
         label: 'toggle',
@@ -41,6 +43,7 @@ export default function Home() {
         step: 2,
         shape: 'circle'
       },
+      // Update
       {
         id: 'update',
         label: 'update',
@@ -54,12 +57,14 @@ export default function Home() {
     ];
 
     const connections: Connection[] = [
+      // Click to toggle
       {
         from: 'click',
         to: 'toggle',
         color: 'green' as const,
         step: 1
       },
+      // Toggle to update
       {
         from: 'toggle',
         to: 'update',
@@ -85,7 +90,7 @@ export default function Home() {
       });
     });
 
-    // Add connections and small nodes
+    // Add connections
     connections.forEach((conn, index) => {
       const fromNode = nodeMap.get(conn.from);
       const toNode = nodeMap.get(conn.to);
@@ -109,20 +114,6 @@ export default function Home() {
           width: distance,
           label: ''
         });
-
-        // Only add small nodes for diagonal connections
-        if (Math.abs(angle) > 1) {
-          nodes.push({
-            id: `small-${index}`,
-            type: 'small-node',
-            x: fromNode.x + dx / 2,
-            y: fromNode.y + dy / 2,
-            color: conn.color,
-            active: false,
-            step: conn.step,
-            label: ''
-          });
-        }
       }
     });
 
@@ -351,7 +342,27 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-[#1a1a1a] flex items-center justify-center">
+    <main className="min-h-screen bg-[#1a1a1a] flex flex-col items-center justify-center relative">
+      <header className="fixed top-0 w-full py-4 text-center text-sm text-gray-400 z-10">
+        <div className="flex items-center justify-center gap-2">
+          <span>Ketan Todo</span>
+          <a 
+            href="https://twitter.com/patilketan671" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-[#00ff9d] hover:text-[#00ff9d]/80 transition-colors"
+          >
+            <svg 
+              viewBox="0 0 24 24" 
+              className="w-5 h-5 fill-current"
+              aria-hidden="true"
+            >
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+          </a>
+        </div>
+      </header>
+
       <div className="flow-background">
         {flowNodes.map(node => (
           <div
@@ -409,6 +420,26 @@ export default function Home() {
           <button onClick={addTodo}>→</button>
         </div>
       </div>
+
+      <footer className="fixed bottom-0 w-full py-4 text-center text-sm text-gray-400">
+        <div className="flex items-center justify-center gap-2">
+          <span>2024 @Ketan - All Rights Reserved - Created by Ketan</span>
+          <a 
+            href="https://twitter.com/patilketan671" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-[#00ff9d] hover:text-[#00ff9d]/80 transition-colors"
+          >
+            <svg 
+              viewBox="0 0 24 24" 
+              className="w-5 h-5 fill-current"
+              aria-hidden="true"
+            >
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+          </a>
+        </div>
+      </footer>
     </main>
   );
 }
