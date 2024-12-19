@@ -175,7 +175,8 @@ export default function Home() {
         color: 'green' as const,
         x: baseX,
         y: baseY,
-        step: 1
+        step: 1,
+        shape: 'circle'
       },
       { 
         id: 'event',
@@ -184,7 +185,8 @@ export default function Home() {
         color: 'yellow' as const,
         x: baseX + 120,
         y: baseY,
-        step: 2
+        step: 2,
+        shape: 'circle'
       },
       { 
         id: 'listen',
@@ -193,11 +195,27 @@ export default function Home() {
         color: 'yellow' as const,
         x: baseX + 240,
         y: baseY,
-        step: 3
+        step: 3,
+        shape: 'circle'
       }
     ];
 
-    return createFlowNodes(steps);
+    const connections: Connection[] = [
+      {
+        from: 'remove-child',
+        to: 'event',
+        color: 'yellow' as const,
+        step: 1
+      },
+      {
+        from: 'event',
+        to: 'listen',
+        color: 'yellow' as const,
+        step: 2
+      }
+    ];
+
+    return createFlowNodesWithConnections(steps, connections);
   };
 
   const createFlowNodes = (steps: FlowStep[]) => {
@@ -255,7 +273,8 @@ export default function Home() {
         color: 'green' as const,
         x: baseX,
         y: baseY,
-        step: 1
+        step: 1,
+        shape: 'circle'
       },
       { 
         id: 'listen',
@@ -264,7 +283,8 @@ export default function Home() {
         color: 'green' as const,
         x: baseX + 120,
         y: baseY,
-        step: 2
+        step: 2,
+        shape: 'circle'
       },
       { 
         id: 'set-todo',
@@ -273,7 +293,8 @@ export default function Home() {
         color: 'green' as const,
         x: baseX + 240,
         y: baseY,
-        step: 3
+        step: 3,
+        shape: 'circle'
       },
       { 
         id: 'constant',
@@ -282,11 +303,33 @@ export default function Home() {
         color: 'yellow' as const,
         x: baseX + 360,
         y: baseY,
-        step: 4
+        step: 4,
+        shape: 'circle'
       }
     ];
 
-    return createFlowNodes(steps);
+    const connections: Connection[] = [
+      {
+        from: 'make-todo',
+        to: 'listen',
+        color: 'green' as const,
+        step: 1
+      },
+      {
+        from: 'listen',
+        to: 'set-todo',
+        color: 'green' as const,
+        step: 2
+      },
+      {
+        from: 'set-todo',
+        to: 'constant',
+        color: 'yellow' as const,
+        step: 3
+      }
+    ];
+
+    return createFlowNodesWithConnections(steps, connections);
   };
 
   useEffect(() => {
