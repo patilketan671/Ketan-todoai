@@ -168,12 +168,12 @@ export default function Home() {
         if (currentStep <= maxStep) {
           timeoutId = setTimeout(() => {
             setCurrentStep(prev => prev + 1);
-          }, 500);
+          }, 700);
         } else {
           timeoutId = setTimeout(() => {
             setFlowNodes([]);
             setCurrentStep(0);
-          }, 500);
+          }, 700);
         }
       }
     };
@@ -200,7 +200,7 @@ export default function Home() {
       if (nodes) {
         startFlow(nodes);
         
-        await new Promise(resolve => setTimeout(resolve, 4000));
+        await new Promise(resolve => setTimeout(resolve, 3500));
         
         const newTodo = {
           text: newTodoText,
@@ -237,7 +237,7 @@ export default function Home() {
       todoElement.classList.add('removing');
       setTimeout(() => {
         setTodos(prev => prev.filter((_, i) => i !== index));
-      }, 4000);
+      }, 3500);
     }
   };
 
