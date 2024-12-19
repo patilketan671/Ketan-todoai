@@ -21,6 +21,7 @@ export interface FlowStep {
   y: number;
   step: number;
   shape?: 'circle' | 'square';
+  nodeType?: string;
 }
 
 export interface FlowNode extends Omit<FlowStep, 'shape'> {
@@ -29,4 +30,5 @@ export interface FlowNode extends Omit<FlowStep, 'shape'> {
   rotation?: number;
   width?: number;
   shape?: 'circle' | 'square';
+  nodeType?: string;
 } 

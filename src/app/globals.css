@@ -42,6 +42,7 @@ body {
   height: 50px;
   background: #1a1a1a;
   border: 2px solid currentColor;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -49,23 +50,15 @@ body {
   position: relative;
 }
 
-.flow-node.node.circle {
-  border-radius: 50%;
-}
-
-.flow-node.node.square {
-  border-radius: 4px;
-}
-
 .flow-node.node .node-icon {
-  font-size: 24px;
+  font-size: 18px;
   line-height: 1;
   filter: drop-shadow(0 0 8px currentColor);
 }
 
 .flow-node.small-node {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   background: currentColor;
   border-radius: 50%;
   box-shadow: 0 0 12px currentColor;
@@ -75,8 +68,13 @@ body {
   height: 2px;
   background: currentColor;
   box-shadow: 0 0 10px currentColor;
-  opacity: 0.7;
+  opacity: 0.9;
   transform-origin: left center;
+}
+
+.flow-node.connection[style*="rotate"] {
+  opacity: 0.9;
+  height: 2px;
 }
 
 .flow-node.green {
@@ -89,14 +87,14 @@ body {
 
 .node-label {
   position: absolute;
-  bottom: -24px;
+  bottom: -20px;
   left: 50%;
   transform: translateX(-50%);
   white-space: nowrap;
   font-size: 12px;
   color: currentColor;
   text-shadow: 0 0 8px currentColor;
-  opacity: 0.8;
+  opacity: 0.9;
 }
 
 .node-sublabel {

@@ -21,85 +21,49 @@ export default function Home() {
     const baseY = rect.top + rect.height / 2;
 
     const steps: FlowStep[] = [
-      // Main set todo node
-      { 
-        id: 'set-todo',
-        label: 'set todo',
-        subLabel: 'done',
-        icon: '✓',
+      {
+        id: 'click',
+        label: 'click',
+        icon: '🖱️',
         color: 'green' as const,
         x: baseX,
         y: baseY,
         step: 1,
         shape: 'circle'
       },
-      // Upper branch - list nodes
       {
-        id: 'list-1',
-        label: 'list',
+        id: 'toggle',
+        label: 'toggle',
+        icon: '✓',
         color: 'green' as const,
-        x: baseX + 80,
-        y: baseY - 40,
+        x: baseX + 100,
+        y: baseY,
         step: 2,
         shape: 'circle'
       },
       {
-        id: 'constant-1',
-        label: 'constant',
+        id: 'update',
+        label: 'update',
         icon: '🔄',
-        color: 'yellow' as const,
-        x: baseX + 200,
-        y: baseY - 40,
-        step: 3,
-        shape: 'circle'
-      },
-      // Lower branch - done nodes
-      {
-        id: 'done-1',
-        label: 'done',
         color: 'green' as const,
-        x: baseX + 80,
-        y: baseY + 40,
-        step: 2,
-        shape: 'circle'
-      },
-      {
-        id: 'false-node',
-        label: 'false',
-        color: 'yellow' as const,
         x: baseX + 200,
-        y: baseY + 40,
+        y: baseY,
         step: 3,
-        shape: 'square'
+        shape: 'circle'
       }
     ];
 
-    // Additional connections
     const connections: Connection[] = [
-      // Upper branch connections
       {
-        from: 'set-todo',
-        to: 'list-1',
+        from: 'click',
+        to: 'toggle',
         color: 'green' as const,
         step: 1
       },
       {
-        from: 'list-1',
-        to: 'constant-1',
-        color: 'yellow' as const,
-        step: 2
-      },
-      // Lower branch connections
-      {
-        from: 'set-todo',
-        to: 'done-1',
+        from: 'toggle',
+        to: 'update',
         color: 'green' as const,
-        step: 1
-      },
-      {
-        from: 'done-1',
-        to: 'false-node',
-        color: 'yellow' as const,
         step: 2
       }
     ];
@@ -146,17 +110,19 @@ export default function Home() {
           label: ''
         });
 
-        // Small node in the middle of connection
-        nodes.push({
-          id: `small-${index}`,
-          type: 'small-node',
-          x: fromNode.x + dx / 2,
-          y: fromNode.y + dy / 2,
-          color: conn.color,
-          active: false,
-          step: conn.step,
-          label: ''
-        });
+        // Only add small nodes for diagonal connections
+        if (Math.abs(angle) > 1) {
+          nodes.push({
+            id: `small-${index}`,
+            type: 'small-node',
+            x: fromNode.x + dx / 2,
+            y: fromNode.y + dy / 2,
+            color: conn.color,
+            active: false,
+            step: conn.step,
+            label: ''
+          });
+        }
       }
     });
 
@@ -169,32 +135,32 @@ export default function Home() {
     const baseY = rect.top + rect.height / 2;
 
     const steps: FlowStep[] = [
-      { 
-        id: 'remove-child',
-        label: 'remove child',
-        icon: '❌',
+      {
+        id: 'click',
+        label: 'click',
+        icon: '🖱️',
         color: 'green' as const,
         x: baseX,
         y: baseY,
         step: 1,
         shape: 'circle'
       },
-      { 
-        id: 'event',
-        label: 'event',
-        icon: '⚡',
-        color: 'yellow' as const,
-        x: baseX + 120,
+      {
+        id: 'remove',
+        label: 'remove',
+        icon: '❌',
+        color: 'green' as const,
+        x: baseX + 100,
         y: baseY,
         step: 2,
         shape: 'circle'
       },
-      { 
-        id: 'listen',
-        label: 'listen',
-        icon: '👂',
-        color: 'yellow' as const,
-        x: baseX + 240,
+      {
+        id: 'update',
+        label: 'update',
+        icon: '🔄',
+        color: 'green' as const,
+        x: baseX + 200,
         y: baseY,
         step: 3,
         shape: 'circle'
@@ -203,15 +169,15 @@ export default function Home() {
 
     const connections: Connection[] = [
       {
-        from: 'remove-child',
-        to: 'event',
-        color: 'yellow' as const,
+        from: 'click',
+        to: 'remove',
+        color: 'green' as const,
         step: 1
       },
       {
-        from: 'event',
-        to: 'listen',
-        color: 'yellow' as const,
+        from: 'remove',
+        to: 'update',
+        color: 'green' as const,
         step: 2
       }
     ];
@@ -228,7 +194,8 @@ export default function Home() {
     const baseY = rect.top + rect.height / 2;
 
     const steps: FlowStep[] = [
-      { 
+      // Make todo
+      {
         id: 'make-todo',
         label: 'make todo',
         icon: '✏️',
@@ -238,56 +205,43 @@ export default function Home() {
         step: 1,
         shape: 'circle'
       },
-      { 
-        id: 'listen',
-        label: 'listen',
-        icon: '👂',
+      // Append todo
+      {
+        id: 'append-todo',
+        label: 'append todo',
         color: 'green' as const,
-        x: baseX + 120,
+        x: baseX + 100,
         y: baseY,
         step: 2,
         shape: 'circle'
       },
-      { 
-        id: 'set-todo',
-        label: 'set todo',
-        icon: '✅',
+      // Todo item
+      {
+        id: 'todo-item',
+        label: 'todo item',
+        icon: '📝',
         color: 'green' as const,
-        x: baseX + 240,
+        x: baseX + 200,
         y: baseY,
         step: 3,
-        shape: 'circle'
-      },
-      { 
-        id: 'constant',
-        label: 'constant',
-        icon: '🔄',
-        color: 'yellow' as const,
-        x: baseX + 360,
-        y: baseY,
-        step: 4,
         shape: 'circle'
       }
     ];
 
     const connections: Connection[] = [
+      // Make todo to append todo
       {
         from: 'make-todo',
-        to: 'listen',
+        to: 'append-todo',
         color: 'green' as const,
         step: 1
       },
+      // Append todo to todo item
       {
-        from: 'listen',
-        to: 'set-todo',
+        from: 'append-todo',
+        to: 'todo-item',
         color: 'green' as const,
         step: 2
-      },
-      {
-        from: 'set-todo',
-        to: 'constant',
-        color: 'yellow' as const,
-        step: 3
       }
     ];
 
@@ -409,6 +363,7 @@ export default function Home() {
               transform: `translate(-50%, -50%) scale(${node.active ? 1 : 0})${node.rotation ? ` rotate(${node.rotation}deg)` : ''}`,
               width: node.type === 'connection' && node.width ? `${node.width}px` : undefined
             }}
+            data-node-type={node.nodeType}
           >
             {node.type === 'node' && (
               <>
