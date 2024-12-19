@@ -20,13 +20,13 @@ export default function Home() {
     const baseX = rect.right + 100;
     const baseY = rect.top + rect.height / 2;
 
-    const steps = [
+    const steps: FlowStep[] = [
       { 
         id: 'set-done',
         label: 'set todo',
         subLabel: 'done',
         icon: '✅',
-        color: 'green',
+        color: 'green' as const,
         x: baseX,
         y: baseY,
         step: 1
@@ -35,7 +35,7 @@ export default function Home() {
         id: 'child-set',
         label: 'child set',
         icon: '📝',
-        color: 'green',
+        color: 'green' as const,
         x: baseX + 120,
         y: baseY,
         step: 2
@@ -44,7 +44,7 @@ export default function Home() {
         id: 'listen',
         label: 'listen',
         icon: '👂',
-        color: 'yellow',
+        color: 'yellow' as const,
         x: baseX + 240,
         y: baseY,
         step: 3
@@ -59,12 +59,12 @@ export default function Home() {
     const baseX = rect.right + 100;
     const baseY = rect.top + rect.height / 2;
 
-    const steps = [
+    const steps: FlowStep[] = [
       { 
         id: 'remove-child',
         label: 'remove child',
         icon: '❌',
-        color: 'green',
+        color: 'green' as const,
         x: baseX,
         y: baseY,
         step: 1
@@ -73,7 +73,7 @@ export default function Home() {
         id: 'event',
         label: 'event',
         icon: '⚡',
-        color: 'yellow',
+        color: 'yellow' as const,
         x: baseX + 120,
         y: baseY,
         step: 2
@@ -82,7 +82,7 @@ export default function Home() {
         id: 'listen',
         label: 'listen',
         icon: '👂',
-        color: 'yellow',
+        color: 'yellow' as const,
         x: baseX + 240,
         y: baseY,
         step: 3
@@ -141,12 +141,12 @@ export default function Home() {
     const baseX = rect.right + 100;
     const baseY = rect.top + rect.height / 2;
 
-    const steps = [
+    const steps: FlowStep[] = [
       { 
         id: 'make-todo',
         label: 'make todo',
         icon: '✏️',
-        color: 'green',
+        color: 'green' as const,
         x: baseX,
         y: baseY,
         step: 1
@@ -155,7 +155,7 @@ export default function Home() {
         id: 'listen',
         label: 'listen',
         icon: '👂',
-        color: 'green',
+        color: 'green' as const,
         x: baseX + 120,
         y: baseY,
         step: 2
@@ -164,7 +164,7 @@ export default function Home() {
         id: 'set-todo',
         label: 'set todo',
         icon: '✅',
-        color: 'green',
+        color: 'green' as const,
         x: baseX + 240,
         y: baseY,
         step: 3
@@ -173,7 +173,7 @@ export default function Home() {
         id: 'constant',
         label: 'constant',
         icon: '🔄',
-        color: 'yellow',
+        color: 'yellow' as const,
         x: baseX + 360,
         y: baseY,
         step: 4
