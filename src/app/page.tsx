@@ -75,31 +75,31 @@ export default function Home() {
     ];
 
     // Additional connections
-    const connections = [
+    const connections: Connection[] = [
       // Upper branch connections
       {
         from: 'set-todo',
         to: 'list-1',
-        color: 'green',
+        color: 'green' as const,
         step: 1
       },
       {
         from: 'list-1',
         to: 'constant-1',
-        color: 'yellow',
+        color: 'yellow' as const,
         step: 2
       },
       // Lower branch connections
       {
         from: 'set-todo',
         to: 'done-1',
-        color: 'green',
+        color: 'green' as const,
         step: 1
       },
       {
         from: 'done-1',
         to: 'false-node',
-        color: 'yellow',
+        color: 'yellow' as const,
         step: 2
       }
     ];
@@ -116,7 +116,8 @@ export default function Home() {
       nodes.push({
         ...step,
         type: 'node',
-        active: false
+        active: false,
+        label: step.label
       });
     });
 
@@ -447,7 +448,7 @@ export default function Home() {
             type="text"
             value={newTodoText}
             onChange={(e) => setNewTodoText(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyPress}
             placeholder="Add new todo"
           />
           <button onClick={addTodo}>→</button>
