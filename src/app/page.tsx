@@ -1,101 +1,345 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect, useRef } from 'react';
+
+interface Todo {
+  text: string;
+  done: boolean;
+  id: string;
+}
+
+interface FlowNode {
+  x: number;
+  y: number;
+  id: string;
+  type: 'node' | 'connection' | 'small-node';
+  label?: string;
+  color?: 'green' | 'yellow';
+  active?: boolean;
+  icon?: string;
+  step?: number;
+}
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [todos, setTodos] = useState<Todo[]>([
+    { text: "Laundry", done: true, id: "1" },
+    { text: "Work", done: false, id: "2" },
+    { text: "Research", done: false, id: "3" }
+  ]);
+  const [newTodoText, setNewTodoText] = useState('');
+  const [flowNodes, setFlowNodes] = useState<FlowNode[]>([]);
+  const [currentStep, setCurrentStep] = useState(0);
+  const todoListRef = useRef<HTMLDivElement>(null);
+  const addTodoRef = useRef<HTMLDivElement>(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  const createToggleFlow = (todoElement: HTMLElement) => {
+    const rect = todoElement.getBoundingClientRect();
+    const baseX = rect.right + 100;
+    const baseY = rect.top + rect.height / 2;
+
+    const steps = [
+      { 
+        id: 'set-done',
+        label: 'set todo',
+        subLabel: 'done',
+        icon: '✅',
+        color: 'green',
+        x: baseX,
+        y: baseY,
+        step: 1
+      },
+      { 
+        id: 'child-set',
+        label: 'child set',
+        icon: '📝',
+        color: 'green',
+        x: baseX + 120,
+        y: baseY,
+        step: 2
+      },
+      { 
+        id: 'listen',
+        label: 'listen',
+        icon: '👂',
+        color: 'yellow',
+        x: baseX + 240,
+        y: baseY,
+        step: 3
+      }
+    ];
+
+    return createFlowNodes(steps);
+  };
+
+  const createRemoveFlow = (todoElement: HTMLElement) => {
+    const rect = todoElement.getBoundingClientRect();
+    const baseX = rect.right + 100;
+    const baseY = rect.top + rect.height / 2;
+
+    const steps = [
+      { 
+        id: 'remove-child',
+        label: 'remove child',
+        icon: '❌',
+        color: 'green',
+        x: baseX,
+        y: baseY,
+        step: 1
+      },
+      { 
+        id: 'event',
+        label: 'event',
+        icon: '⚡',
+        color: 'yellow',
+        x: baseX + 120,
+        y: baseY,
+        step: 2
+      },
+      { 
+        id: 'listen',
+        label: 'listen',
+        icon: '👂',
+        color: 'yellow',
+        x: baseX + 240,
+        y: baseY,
+        step: 3
+      }
+    ];
+
+    return createFlowNodes(steps);
+  };
+
+  const createFlowNodes = (steps: any[]) => {
+    const nodes: FlowNode[] = [];
+
+    steps.forEach((step, index) => {
+      // Main node
+      nodes.push({
+        ...step,
+        type: 'node',
+        active: false
+      });
+
+      // Connection to next node
+      if (index < steps.length - 1) {
+        nodes.push({
+          x: step.x + 60,
+          y: step.y,
+          id: `connection-${index}`,
+          type: 'connection',
+          color: steps[index + 1].color,
+          active: false,
+          step: step.step
+        });
+
+        // Small nodes on connection
+        [0.3, 0.7].forEach((pos, i) => {
+          nodes.push({
+            x: step.x + 60 + (pos * 60),
+            y: step.y,
+            id: `small-${index}-${i}`,
+            type: 'small-node',
+            color: steps[index + 1].color,
+            active: false,
+            step: step.step
+          });
+        });
+      }
+    });
+
+    return nodes;
+  };
+
+  const createAddFlow = () => {
+    const addTodoElement = addTodoRef.current;
+    if (!addTodoElement) return;
+
+    const rect = addTodoElement.getBoundingClientRect();
+    const baseX = rect.right + 100;
+    const baseY = rect.top + rect.height / 2;
+
+    const steps = [
+      { 
+        id: 'make-todo',
+        label: 'make todo',
+        icon: '✏️',
+        color: 'green',
+        x: baseX,
+        y: baseY,
+        step: 1
+      },
+      { 
+        id: 'listen',
+        label: 'listen',
+        icon: '👂',
+        color: 'green',
+        x: baseX + 120,
+        y: baseY,
+        step: 2
+      },
+      { 
+        id: 'set-todo',
+        label: 'set todo',
+        icon: '✅',
+        color: 'green',
+        x: baseX + 240,
+        y: baseY,
+        step: 3
+      },
+      { 
+        id: 'constant',
+        label: 'constant',
+        icon: '🔄',
+        color: 'yellow',
+        x: baseX + 360,
+        y: baseY,
+        step: 4
+      }
+    ];
+
+    return createFlowNodes(steps);
+  };
+
+  useEffect(() => {
+    if (currentStep > 0) {
+      // Store current nodes in a variable to avoid dependency issues
+      const currentNodes = flowNodes;
+      const maxStep = Math.max(...currentNodes.map(n => n.step || 0));
+
+      // Update active states
+      setFlowNodes(prev => prev.map(node => ({
+        ...node,
+        active: node.step === currentStep
+      })));
+
+      // Schedule next step or cleanup
+      if (currentStep <= maxStep) {
+        const timer = setTimeout(() => {
+          setCurrentStep(prev => prev + 1);
+        }, 800);
+        return () => clearTimeout(timer);
+      } else {
+        const timer = setTimeout(() => {
+          setFlowNodes([]);
+          setCurrentStep(0);
+        }, 1000);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [currentStep]); // Only depend on currentStep
+
+  const startFlow = (nodes: FlowNode[]) => {
+    setFlowNodes(nodes);
+    setCurrentStep(1);
+  };
+
+  const addTodo = async () => {
+    if (newTodoText.trim()) {
+      const nodes = createAddFlow();
+      startFlow(nodes);
+      
+      await new Promise(resolve => setTimeout(resolve, 3200));
+      
+      const newTodo = {
+        text: newTodoText,
+        done: false,
+        id: Date.now().toString()
+      };
+      
+      setTodos(prev => [...prev, newTodo]);
+      setNewTodoText('');
+    }
+  };
+
+  const toggleTodo = (index: number) => {
+    const todoElement = todoListRef.current?.children[index] as HTMLElement;
+    if (todoElement) {
+      const nodes = createToggleFlow(todoElement);
+      startFlow(nodes);
+
+      setTimeout(() => {
+        const newTodos = [...todos];
+        newTodos[index].done = !newTodos[index].done;
+        setTodos(newTodos);
+      }, 2400);
+    }
+  };
+
+  const removeTodo = (index: number) => {
+    const todoElement = todoListRef.current?.children[index] as HTMLElement;
+    if (todoElement) {
+      const nodes = createRemoveFlow(todoElement);
+      startFlow(nodes);
+
+      todoElement.classList.add('removing');
+      setTimeout(() => {
+        setTodos(prev => prev.filter((_, i) => i !== index));
+      }, 2400);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      addTodo();
+    }
+  };
+
+  return (
+    <main className="min-h-screen bg-[#1a1a1a] flex items-center justify-center">
+      <div className="flow-background">
+        {flowNodes.map(node => (
+          <div
+            key={node.id}
+            className={`flow-node ${node.type} ${node.color} ${node.active ? 'active' : ''}`}
+            style={{
+              left: `${node.x}px`,
+              top: `${node.y}px`,
+              transform: `translate(-50%, -50%) scale(${node.active ? 1 : 0})`
+            }}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            {node.type === 'node' && (
+              <>
+                {node.icon && <span className="node-icon">{node.icon}</span>}
+                {node.label && <span className="node-label">{node.label}</span>}
+              </>
+            )}
+          </div>
+        ))}
+      </div>
+      
+      <div className="todo-app">
+        <div className="todo-list" ref={todoListRef}>
+          {todos.map((todo, index) => (
+            <div key={todo.id} className="todo-item group">
+              <input
+                type="checkbox"
+                checked={todo.done}
+                onChange={() => toggleTodo(index)}
+              />
+              <span className={todo.done ? 'done' : ''}>
+                {todo.text}
+              </span>
+              <button
+                onClick={() => removeTodo(index)}
+                className="ml-auto text-[#00ff9d] opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                ×
+              </button>
+            </div>
+          ))}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+        
+        <div className="add-todo" ref={addTodoRef}>
+          <input
+            type="text"
+            value={newTodoText}
+            onChange={(e) => setNewTodoText(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Add new todo"
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+          <button onClick={addTodo}>→</button>
+        </div>
+      </div>
+    </main>
   );
 }
