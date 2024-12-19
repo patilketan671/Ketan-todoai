@@ -1,35 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-
-interface Todo {
-  text: string;
-  done: boolean;
-  id: string;
-}
-
-interface FlowStep {
-  id: string;
-  label: string;
-  subLabel?: string;
-  icon?: string;
-  color: 'green' | 'yellow';
-  x: number;
-  y: number;
-  step: number;
-}
-
-interface FlowNode {
-  x: number;
-  y: number;
-  id: string;
-  type: 'node' | 'connection' | 'small-node';
-  label?: string;
-  color?: 'green' | 'yellow';
-  active?: boolean;
-  icon?: string;
-  step?: number;
-}
+import { Todo, FlowStep, FlowNode } from '@/types';
 
 export default function Home() {
   const [todos, setTodos] = useState<Todo[]>([
