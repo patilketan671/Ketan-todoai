@@ -16,12 +16,10 @@ export default function Home() {
   const addTodoRef = useRef<HTMLDivElement>(null);
 
   const createToggleFlow = (todoElement: HTMLElement) => {
-    const rect = todoElement.getBoundingClientRect();
-    const baseX = rect.right + 100;
-    const baseY = rect.top + rect.height / 2;
+    const baseX = 150;
+    const baseY = 60;
 
     const steps: FlowStep[] = [
-      // Click
       {
         id: 'click',
         label: 'click',
@@ -32,98 +30,39 @@ export default function Home() {
         step: 1,
         shape: 'circle'
       },
-      // Toggle
       {
         id: 'toggle',
         label: 'toggle',
         icon: '✓',
         color: 'green' as const,
-        x: baseX + 100,
+        x: baseX,
         y: baseY,
         step: 2,
         shape: 'circle'
       },
-      // Update
       {
         id: 'update',
         label: 'update',
         icon: '🔄',
         color: 'green' as const,
-        x: baseX + 200,
+        x: baseX,
         y: baseY,
         step: 3,
         shape: 'circle'
       }
     ];
 
-    const connections: Connection[] = [
-      // Click to toggle
-      {
-        from: 'click',
-        to: 'toggle',
-        color: 'green' as const,
-        step: 1
-      },
-      // Toggle to update
-      {
-        from: 'toggle',
-        to: 'update',
-        color: 'green' as const,
-        step: 2
-      }
-    ];
-
-    return createFlowNodesWithConnections(steps, connections);
-  };
-
-  const createFlowNodesWithConnections = (steps: FlowStep[], connections: Connection[]) => {
-    const nodes: FlowNode[] = [];
-    const nodeMap = new Map(steps.map(step => [step.id, step]));
-
-    // Add all main nodes
-    steps.forEach(step => {
-      nodes.push({
-        ...step,
-        type: 'node',
-        active: false,
-        label: step.label
-      });
-    });
-
-    // Add connections
-    connections.forEach((conn, index) => {
-      const fromNode = nodeMap.get(conn.from);
-      const toNode = nodeMap.get(conn.to);
-      
-      if (fromNode && toNode) {
-        const dx = toNode.x - fromNode.x;
-        const dy = toNode.y - fromNode.y;
-        const angle = Math.atan2(dy, dx) * (180 / Math.PI);
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        // Main connection line
-        nodes.push({
-          id: `conn-${index}`,
-          type: 'connection',
-          x: fromNode.x,
-          y: fromNode.y,
-          color: conn.color,
-          active: false,
-          step: conn.step,
-          rotation: angle,
-          width: distance,
-          label: ''
-        });
-      }
-    });
-
-    return nodes;
+    return steps.map(step => ({
+      ...step,
+      type: 'node' as const,
+      active: false,
+      label: step.label
+    }));
   };
 
   const createRemoveFlow = (todoElement: HTMLElement) => {
-    const rect = todoElement.getBoundingClientRect();
-    const baseX = rect.right + 100;
-    const baseY = rect.top + rect.height / 2;
+    const baseX = 150;
+    const baseY = 60;
 
     const steps: FlowStep[] = [
       {
@@ -141,7 +80,7 @@ export default function Home() {
         label: 'remove',
         icon: '❌',
         color: 'green' as const,
-        x: baseX + 100,
+        x: baseX,
         y: baseY,
         step: 2,
         shape: 'circle'
@@ -151,41 +90,26 @@ export default function Home() {
         label: 'update',
         icon: '🔄',
         color: 'green' as const,
-        x: baseX + 200,
+        x: baseX,
         y: baseY,
         step: 3,
         shape: 'circle'
       }
     ];
 
-    const connections: Connection[] = [
-      {
-        from: 'click',
-        to: 'remove',
-        color: 'green' as const,
-        step: 1
-      },
-      {
-        from: 'remove',
-        to: 'update',
-        color: 'green' as const,
-        step: 2
-      }
-    ];
-
-    return createFlowNodesWithConnections(steps, connections);
+    return steps.map(step => ({
+      ...step,
+      type: 'node' as const,
+      active: false,
+      label: step.label
+    }));
   };
 
   const createAddFlow = () => {
-    const addTodoElement = addTodoRef.current;
-    if (!addTodoElement) return;
-
-    const rect = addTodoElement.getBoundingClientRect();
-    const baseX = rect.right + 100;
-    const baseY = rect.top + rect.height / 2;
+    const baseX = 150;
+    const baseY = 60;
 
     const steps: FlowStep[] = [
-      // Make todo
       {
         id: 'make-todo',
         label: 'make todo',
@@ -196,47 +120,33 @@ export default function Home() {
         step: 1,
         shape: 'circle'
       },
-      // Append todo
       {
         id: 'append-todo',
         label: 'append todo',
         color: 'green' as const,
-        x: baseX + 100,
+        x: baseX,
         y: baseY,
         step: 2,
         shape: 'circle'
       },
-      // Todo item
       {
         id: 'todo-item',
         label: 'todo item',
         icon: '📝',
         color: 'green' as const,
-        x: baseX + 200,
+        x: baseX,
         y: baseY,
         step: 3,
         shape: 'circle'
       }
     ];
 
-    const connections: Connection[] = [
-      // Make todo to append todo
-      {
-        from: 'make-todo',
-        to: 'append-todo',
-        color: 'green' as const,
-        step: 1
-      },
-      // Append todo to todo item
-      {
-        from: 'append-todo',
-        to: 'todo-item',
-        color: 'green' as const,
-        step: 2
-      }
-    ];
-
-    return createFlowNodesWithConnections(steps, connections);
+    return steps.map(step => ({
+      ...step,
+      type: 'node' as const,
+      active: false,
+      label: step.label
+    }));
   };
 
   useEffect(() => {
@@ -246,7 +156,6 @@ export default function Home() {
       if (currentStep > 0 && flowNodes.length > 0) {
         const maxStep = Math.max(...flowNodes.map(n => n.step || 0));
 
-        // Update active states
         const updatedNodes = flowNodes.map(node => ({
           ...node,
           active: node.step === currentStep
@@ -256,16 +165,15 @@ export default function Home() {
           setFlowNodes(updatedNodes);
         }
 
-        // Schedule next step or cleanup
         if (currentStep <= maxStep) {
           timeoutId = setTimeout(() => {
             setCurrentStep(prev => prev + 1);
-          }, 800);
+          }, 500);
         } else {
           timeoutId = setTimeout(() => {
             setFlowNodes([]);
             setCurrentStep(0);
-          }, 1000);
+          }, 500);
         }
       }
     };
@@ -287,12 +195,12 @@ export default function Home() {
   };
 
   const addTodo = async () => {
-    if (newTodoText.trim() && currentStep === 0) {  // Only add if not animating
+    if (newTodoText.trim() && currentStep === 0) {
       const nodes = createAddFlow();
       if (nodes) {
         startFlow(nodes);
         
-        await new Promise(resolve => setTimeout(resolve, 3200));
+        await new Promise(resolve => setTimeout(resolve, 4000));
         
         const newTodo = {
           text: newTodoText,
@@ -324,14 +232,14 @@ export default function Home() {
 
   const removeTodo = (index: number) => {
     const todoElement = todoListRef.current?.children[index] as HTMLElement;
-    if (todoElement && currentStep === 0) {  // Only remove if not animating
+    if (todoElement && currentStep === 0) {
       const nodes = createRemoveFlow(todoElement);
       startFlow(nodes);
 
       todoElement.classList.add('removing');
       setTimeout(() => {
         setTodos(prev => prev.filter((_, i) => i !== index));
-      }, 2400);
+      }, 4000);
     }
   };
 
