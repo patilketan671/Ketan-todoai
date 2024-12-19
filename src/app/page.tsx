@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Todo, FlowStep, FlowNode } from '@/types';
+import { Todo, FlowStep, FlowNode, Connection } from '@/types';
 
 export default function Home() {
   const [todos, setTodos] = useState<Todo[]>([
@@ -107,7 +107,7 @@ export default function Home() {
     return createFlowNodesWithConnections(steps, connections);
   };
 
-  const createFlowNodesWithConnections = (steps: FlowStep[], connections: any[]) => {
+  const createFlowNodesWithConnections = (steps: FlowStep[], connections: Connection[]) => {
     const nodes: FlowNode[] = [];
     const nodeMap = new Map(steps.map(step => [step.id, step]));
 
@@ -141,7 +141,8 @@ export default function Home() {
           active: false,
           step: conn.step,
           rotation: angle,
-          width: distance
+          width: distance,
+          label: ''
         });
 
         // Small node in the middle of connection
@@ -152,7 +153,8 @@ export default function Home() {
           y: fromNode.y + dy / 2,
           color: conn.color,
           active: false,
-          step: conn.step
+          step: conn.step,
+          label: ''
         });
       }
     });

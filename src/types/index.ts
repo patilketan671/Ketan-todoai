@@ -4,6 +4,13 @@ export interface Todo {
   id: string;
 }
 
+export interface Connection {
+  from: string;
+  to: string;
+  color: 'green' | 'yellow';
+  step: number;
+}
+
 export interface FlowStep {
   id: string;
   label: string;
@@ -16,16 +23,9 @@ export interface FlowStep {
   shape?: 'circle' | 'square';
 }
 
-export interface FlowNode {
-  x: number;
-  y: number;
-  id: string;
+export interface FlowNode extends Omit<FlowStep, 'shape'> {
   type: 'node' | 'connection' | 'small-node';
-  label?: string;
-  color?: 'green' | 'yellow';
   active?: boolean;
-  icon?: string;
-  step?: number;
   rotation?: number;
   width?: number;
   shape?: 'circle' | 'square';
