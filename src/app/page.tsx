@@ -21,37 +21,143 @@ export default function Home() {
     const baseY = rect.top + rect.height / 2;
 
     const steps: FlowStep[] = [
+      // Main set todo node
       { 
-        id: 'set-done',
+        id: 'set-todo',
         label: 'set todo',
         subLabel: 'done',
-        icon: '✅',
+        icon: '✓',
         color: 'green' as const,
         x: baseX,
         y: baseY,
-        step: 1
+        step: 1,
+        shape: 'circle'
       },
-      { 
-        id: 'child-set',
-        label: 'child set',
-        icon: '📝',
+      // Upper branch - list nodes
+      {
+        id: 'list-1',
+        label: 'list',
         color: 'green' as const,
-        x: baseX + 120,
-        y: baseY,
-        step: 2
+        x: baseX + 80,
+        y: baseY - 40,
+        step: 2,
+        shape: 'circle'
       },
-      { 
-        id: 'listen',
-        label: 'listen',
-        icon: '👂',
+      {
+        id: 'constant-1',
+        label: 'constant',
+        icon: '🔄',
         color: 'yellow' as const,
-        x: baseX + 240,
-        y: baseY,
-        step: 3
+        x: baseX + 200,
+        y: baseY - 40,
+        step: 3,
+        shape: 'circle'
+      },
+      // Lower branch - done nodes
+      {
+        id: 'done-1',
+        label: 'done',
+        color: 'green' as const,
+        x: baseX + 80,
+        y: baseY + 40,
+        step: 2,
+        shape: 'circle'
+      },
+      {
+        id: 'false-node',
+        label: 'false',
+        color: 'yellow' as const,
+        x: baseX + 200,
+        y: baseY + 40,
+        step: 3,
+        shape: 'square'
       }
     ];
 
-    return createFlowNodes(steps);
+    // Additional connections
+    const connections = [
+      // Upper branch connections
+      {
+        from: 'set-todo',
+        to: 'list-1',
+        color: 'green',
+        step: 1
+      },
+      {
+        from: 'list-1',
+        to: 'constant-1',
+        color: 'yellow',
+        step: 2
+      },
+      // Lower branch connections
+      {
+        from: 'set-todo',
+        to: 'done-1',
+        color: 'green',
+        step: 1
+      },
+      {
+        from: 'done-1',
+        to: 'false-node',
+        color: 'yellow',
+        step: 2
+      }
+    ];
+
+    return createFlowNodesWithConnections(steps, connections);
+  };
+
+  const createFlowNodesWithConnections = (steps: FlowStep[], connections: any[]) => {
+    const nodes: FlowNode[] = [];
+    const nodeMap = new Map(steps.map(step => [step.id, step]));
+
+    // Add all main nodes
+    steps.forEach(step => {
+      nodes.push({
+        ...step,
+        type: 'node',
+        active: false
+      });
+    });
+
+    // Add connections and small nodes
+    connections.forEach((conn, index) => {
+      const fromNode = nodeMap.get(conn.from);
+      const toNode = nodeMap.get(conn.to);
+      
+      if (fromNode && toNode) {
+        const dx = toNode.x - fromNode.x;
+        const dy = toNode.y - fromNode.y;
+        const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        // Main connection line
+        nodes.push({
+          id: `conn-${index}`,
+          type: 'connection',
+          x: fromNode.x,
+          y: fromNode.y,
+          color: conn.color,
+          active: false,
+          step: conn.step,
+          rotation: angle,
+          width: distance
+        });
+
+        // Small node in the middle of connection
+        nodes.push({
+          id: `small-${index}`,
+          type: 'small-node',
+          x: fromNode.x + dx / 2,
+          y: fromNode.y + dy / 2,
+          color: conn.color,
+          active: false,
+          step: conn.step
+        });
+      }
+    });
+
+    return nodes;
   };
 
   const createRemoveFlow = (todoElement: HTMLElement) => {
@@ -115,17 +221,15 @@ export default function Home() {
           step: step.step
         });
 
-        // Small nodes on connection
-        [0.3, 0.7].forEach((pos, i) => {
-          nodes.push({
-            x: step.x + 60 + (pos * 60),
-            y: step.y,
-            id: `small-${index}-${i}`,
-            type: 'small-node',
-            color: steps[index + 1].color,
-            active: false,
-            step: step.step
-          });
+        // Small node on connection
+        nodes.push({
+          x: step.x + 120,
+          y: step.y,
+          id: `small-${index}`,
+          type: 'small-node',
+          color: steps[index + 1].color,
+          active: false,
+          step: step.step
         });
       }
     });
@@ -291,17 +395,19 @@ export default function Home() {
         {flowNodes.map(node => (
           <div
             key={node.id}
-            className={`flow-node ${node.type} ${node.color} ${node.active ? 'active' : ''}`}
+            className={`flow-node ${node.type} ${node.color} ${node.active ? 'active' : ''} ${node.shape || ''}`}
             style={{
               left: `${node.x}px`,
               top: `${node.y}px`,
-              transform: `translate(-50%, -50%) scale(${node.active ? 1 : 0})`
+              transform: `translate(-50%, -50%) scale(${node.active ? 1 : 0})${node.rotation ? ` rotate(${node.rotation}deg)` : ''}`,
+              width: node.type === 'connection' && node.width ? `${node.width}px` : undefined
             }}
           >
             {node.type === 'node' && (
               <>
                 {node.icon && <span className="node-icon">{node.icon}</span>}
                 {node.label && <span className="node-label">{node.label}</span>}
+                {node.subLabel && <span className="node-sublabel">{node.subLabel}</span>}
               </>
             )}
           </div>

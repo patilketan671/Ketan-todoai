@@ -13,6 +13,7 @@ export interface FlowStep {
   x: number;
   y: number;
   step: number;
+  shape?: 'circle' | 'square';
 }
 
 export interface FlowNode {
@@ -25,4 +26,7 @@ export interface FlowNode {
   active?: boolean;
   icon?: string;
   step?: number;
+  rotation?: number;
+  width?: number;
+  shape?: 'circle' | 'square';
 } 
