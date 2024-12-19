@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Todo, FlowStep, FlowNode, Connection } from '@/types';
+import { Todo, FlowStep, FlowNode } from '@/types';
 
 export default function Home() {
   const [todos, setTodos] = useState<Todo[]>([
@@ -15,7 +15,7 @@ export default function Home() {
   const todoListRef = useRef<HTMLDivElement>(null);
   const addTodoRef = useRef<HTMLDivElement>(null);
 
-  const createToggleFlow = (todoElement: HTMLElement) => {
+  const createToggleFlow = () => {
     const baseX = 150;
     const baseY = 60;
 
@@ -60,7 +60,7 @@ export default function Home() {
     }));
   };
 
-  const createRemoveFlow = (todoElement: HTMLElement) => {
+  const createRemoveFlow = () => {
     const baseX = 150;
     const baseY = 60;
 
@@ -216,16 +216,14 @@ export default function Home() {
 
   const toggleTodo = (index: number) => {
     const todoElement = todoListRef.current?.children[index] as HTMLElement;
-    if (todoElement && currentStep === 0) {  // Only toggle if not animating
-      // Update state immediately for better UX
+    if (todoElement && currentStep === 0) {
       setTodos(prev => {
         const newTodos = [...prev];
         newTodos[index].done = !newTodos[index].done;
         return newTodos;
       });
 
-      // Show animation
-      const nodes = createToggleFlow(todoElement);
+      const nodes = createToggleFlow();
       startFlow(nodes);
     }
   };
@@ -233,7 +231,7 @@ export default function Home() {
   const removeTodo = (index: number) => {
     const todoElement = todoListRef.current?.children[index] as HTMLElement;
     if (todoElement && currentStep === 0) {
-      const nodes = createRemoveFlow(todoElement);
+      const nodes = createRemoveFlow();
       startFlow(nodes);
 
       todoElement.classList.add('removing');
