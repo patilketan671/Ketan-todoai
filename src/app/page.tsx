@@ -218,45 +218,6 @@ export default function Home() {
     return createFlowNodesWithConnections(steps, connections);
   };
 
-  const createFlowNodes = (steps: FlowStep[]) => {
-    const nodes: FlowNode[] = [];
-
-    steps.forEach((step, index) => {
-      // Main node
-      nodes.push({
-        ...step,
-        type: 'node',
-        active: false
-      });
-
-      // Connection to next node
-      if (index < steps.length - 1) {
-        nodes.push({
-          x: step.x + 60,
-          y: step.y,
-          id: `connection-${index}`,
-          type: 'connection',
-          color: steps[index + 1].color,
-          active: false,
-          step: step.step
-        });
-
-        // Small node on connection
-        nodes.push({
-          x: step.x + 120,
-          y: step.y,
-          id: `small-${index}`,
-          type: 'small-node',
-          color: steps[index + 1].color,
-          active: false,
-          step: step.step
-        });
-      }
-    });
-
-    return nodes;
-  };
-
   const createAddFlow = () => {
     const addTodoElement = addTodoRef.current;
     if (!addTodoElement) return;
