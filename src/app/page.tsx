@@ -8,6 +8,17 @@ interface Todo {
   id: string;
 }
 
+interface FlowStep {
+  id: string;
+  label: string;
+  subLabel?: string;
+  icon?: string;
+  color: 'green' | 'yellow';
+  x: number;
+  y: number;
+  step: number;
+}
+
 interface FlowNode {
   x: number;
   y: number;
@@ -109,7 +120,7 @@ export default function Home() {
     return createFlowNodes(steps);
   };
 
-  const createFlowNodes = (steps: any[]) => {
+  const createFlowNodes = (steps: FlowStep[]) => {
     const nodes: FlowNode[] = [];
 
     steps.forEach((step, index) => {
@@ -201,73 +212,91 @@ export default function Home() {
   };
 
   useEffect(() => {
-    if (currentStep > 0) {
-      // Store current nodes in a variable to avoid dependency issues
-      const currentNodes = flowNodes;
-      const maxStep = Math.max(...currentNodes.map(n => n.step || 0));
+    let timeoutId: NodeJS.Timeout;
 
-      // Update active states
-      setFlowNodes(prev => prev.map(node => ({
-        ...node,
-        active: node.step === currentStep
-      })));
+    const updateFlow = () => {
+      if (currentStep > 0 && flowNodes.length > 0) {
+        const maxStep = Math.max(...flowNodes.map(n => n.step || 0));
 
-      // Schedule next step or cleanup
-      if (currentStep <= maxStep) {
-        const timer = setTimeout(() => {
-          setCurrentStep(prev => prev + 1);
-        }, 800);
-        return () => clearTimeout(timer);
-      } else {
-        const timer = setTimeout(() => {
-          setFlowNodes([]);
-          setCurrentStep(0);
-        }, 1000);
-        return () => clearTimeout(timer);
+        // Update active states
+        const updatedNodes = flowNodes.map(node => ({
+          ...node,
+          active: node.step === currentStep
+        }));
+
+        if (JSON.stringify(updatedNodes) !== JSON.stringify(flowNodes)) {
+          setFlowNodes(updatedNodes);
+        }
+
+        // Schedule next step or cleanup
+        if (currentStep <= maxStep) {
+          timeoutId = setTimeout(() => {
+            setCurrentStep(prev => prev + 1);
+          }, 800);
+        } else {
+          timeoutId = setTimeout(() => {
+            setFlowNodes([]);
+            setCurrentStep(0);
+          }, 1000);
+        }
       }
-    }
-  }, [currentStep]); // Only depend on currentStep
+    };
+
+    updateFlow();
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [currentStep, flowNodes]);
 
   const startFlow = (nodes: FlowNode[]) => {
-    setFlowNodes(nodes);
-    setCurrentStep(1);
+    if (currentStep === 0) {  // Only start if not already running
+      setFlowNodes(nodes);
+      setCurrentStep(1);
+    }
   };
 
   const addTodo = async () => {
-    if (newTodoText.trim()) {
+    if (newTodoText.trim() && currentStep === 0) {  // Only add if not animating
       const nodes = createAddFlow();
-      startFlow(nodes);
-      
-      await new Promise(resolve => setTimeout(resolve, 3200));
-      
-      const newTodo = {
-        text: newTodoText,
-        done: false,
-        id: Date.now().toString()
-      };
-      
-      setTodos(prev => [...prev, newTodo]);
-      setNewTodoText('');
+      if (nodes) {
+        startFlow(nodes);
+        
+        await new Promise(resolve => setTimeout(resolve, 3200));
+        
+        const newTodo = {
+          text: newTodoText,
+          done: false,
+          id: Date.now().toString()
+        };
+        
+        setTodos(prev => [...prev, newTodo]);
+        setNewTodoText('');
+      }
     }
   };
 
   const toggleTodo = (index: number) => {
     const todoElement = todoListRef.current?.children[index] as HTMLElement;
-    if (todoElement) {
+    if (todoElement && currentStep === 0) {  // Only toggle if not animating
+      // Update state immediately for better UX
+      setTodos(prev => {
+        const newTodos = [...prev];
+        newTodos[index].done = !newTodos[index].done;
+        return newTodos;
+      });
+
+      // Show animation
       const nodes = createToggleFlow(todoElement);
       startFlow(nodes);
-
-      setTimeout(() => {
-        const newTodos = [...todos];
-        newTodos[index].done = !newTodos[index].done;
-        setTodos(newTodos);
-      }, 2400);
     }
   };
 
   const removeTodo = (index: number) => {
     const todoElement = todoListRef.current?.children[index] as HTMLElement;
-    if (todoElement) {
+    if (todoElement && currentStep === 0) {  // Only remove if not animating
       const nodes = createRemoveFlow(todoElement);
       startFlow(nodes);
 
